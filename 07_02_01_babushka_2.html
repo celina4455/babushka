@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babushka 2</title>
+    <link href="https://fonts.googleapis.com/css?family=Oswald|Staatliches|Yatra+One&display=swap" rel="stylesheet">
+
+
+    <style>
+        body {
+
+            background-color: #f0f0ea;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        #dukke {
+            width: 10vw;
+            position: absolute;
+            right: 22vw;
+            top: 0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            max-width: 1000px;
+            margin-left: 15vw;
+            margin-right: 15vw;
+            margin-top: 3vw;
+            background-color: #143d89;
+        }
+
+        article {
+            border: 0.1vw solid #e3b783;
+            padding: 1.5vw;
+            margin: 1.5vw;
+            position: relative;
+        }
+
+
+
+        p {
+            font-family: 'Oswald', sans-serif;
+            color: #e3b783;
+            font-size: 0.9rem;
+        }
+
+
+        h1 {
+            text-align: center;
+            font-family: 'Yatra One', cursive;
+            font-size: 4.5rem;
+            color: #815e36;
+
+        }
+
+
+        h2 {
+            color: #e3b783;
+            font-size: 1.3rem;
+            font-family: 'Staatliches';
+            letter-spacing: 1.3px;
+        }
+
+
+        .valgt {
+            color: #143d89;
+            font-size: 180%;
+
+        }
+
+        button {
+            border: none;
+            background-color: #f0f0ea;
+            margin-bottom: 1vw;
+            color: #815e36;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.9rem;
+
+
+        }
+
+        nav {
+
+            background-color: #f0f0ea;
+            position: absolute;
+            width: 12vw;
+            left: 0vw;
+            top: 10vw;
+
+        }
+
+        .id {
+            position: absolute;
+            top: 0vw;
+            right: 2vw;
+            font-size: 85%;
+        }
+
+
+
+
+        @media screen and (min-width:768px) {}
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Bistro Babushka </h1>
+    <img id="dukke" src="dukke.png" alt="">
+    <nav>
+        <button class="filter valgt" data-ret="alle">Alle</button> <br>
+        <button class="filter" data-ret="forretter">Forretter</button><br>
+        <button class="filter " data-ret="hovedretter">Hovedretter</button><br>
+        <button class="filter" data-ret="desserter">Desserter</button><br>
+        <button class="filter" data-ret="drikkevarer">Drikkevarer</button><br>
+        <button class="filter" data-ret="sideorders">Sideorders</button><br>
+    </nav>
+
+
+    <section class="container"></section>
+
+
+
+    <template>
+
+        <article class="retter">
+            <h2></h2>
+            <img src="" alt="">
+            <p class="id"></p>
+            <p class="pris"></p>
+            <p class="kort"></p>
+            <p class="oprindelse"></p>
+
+        </article>
+
+    </template>
+
+
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", start);
+
+        const endpoint = "https://spreadsheets.google.com/feeds/list/17Dd7DvkPaFamNUdUKlrFgnH6POvBJXac7qyiS6zNRw0/od6/public/values?alt=json";
+
+        let retter = [];
+        let filter = "alle";
+
+
+
+        function start() {
+            hentData();
+            tilføjKlikKnapper();
+        }
+
+        function tilføjKlikKnapper() {
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            })
+        }
+
+        function filtrering() {
+            console.log("FILTRERING");
+            //            document.querySelector("h1").textContent = this.textContent;
+            filter = this.dataset.ret;
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.classList.remove("valgt");
+            })
+            this.classList.add("valgt");
+            visRetter();
+        }
+
+        async function hentData() {
+            const response = await fetch(endpoint);
+            console.log(response);
+            retter = await response.json();
+            visRetter();
+
+
+        }
+
+        function visRetter() {
+
+            const container = document.querySelector(".container");
+            const retterTemplate = document.querySelector("template");
+
+            container.innerHTML = "";
+
+            retter.feed.entry.forEach(hverRet => {
+                if (filter == "alle" || filter == hverRet.gsx$kategori.$t) {
+                    let klon = retterTemplate.cloneNode(true).content;
+                    klon.querySelector("h2").textContent = hverRet.gsx$navn.$t;
+                    klon.querySelector("img").src = "imgs/small/" + hverRet.gsx$billede.$t + "-sm.jpg";
+                    klon.querySelector(".id").textContent = hverRet.gsx$id.$t;
+                    klon.querySelector(".pris").textContent = hverRet.gsx$pris.$t + ",00 DKK";
+                    klon.querySelector(".kort").textContent = hverRet.gsx$kort.$t;
+                    klon.querySelector(".retter").addEventListener("click", () => visNySide(hverRet));
+                    container.appendChild(klon);
+                }
+            })
+
+        }
+
+        function visNySide(hverRet) {
+            location.href = `detalje.html?id=${hverRet.gsx$id.$t}`;
+
+        }
+
+    </script>
+</body>
+
+</html>

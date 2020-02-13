@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babushka 2</title>
+    <link href="https://fonts.googleapis.com/css?family=Oswald|Staatliches|Yatra+One&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+
+            background-color: #f0f0ea;
+
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        #dukke {
+            width: 10vw;
+            position: absolute;
+            right: 22vw;
+            top: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Yatra One', cursive;
+            font-size: 4.5rem;
+            color: #815e36;
+
+        }
+
+        article {
+
+            padding: 1.5vw;
+            margin: 2vw;
+            position: relative;
+        }
+
+
+
+        p {
+            font-family: 'Oswald', sans-serif;
+        }
+
+
+
+
+
+
+        .id {
+            position: absolute;
+            top: 0vw;
+            right: 2vw;
+            font-size: 85%;
+        }
+
+
+
+        #detalje .luk {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 1.7rem;
+            border: none;
+            background-color: #f0f0ea;
+            margin-bottom: 1vw;
+            font-family: 'Staatliches';
+            letter-spacing: 1.3px;
+            color: #815e36;
+
+        }
+
+        #detalje .retterstor {
+
+            width: 60vw;
+            min-height: 50vh;
+            margin: 4rem auto;
+            padding: 4rem;
+            background: #143d89;
+        }
+
+        #detalje h2 {
+            color: #e3b783;
+            font-size: 2.6rem;
+            font-family: 'Staatliches';
+            letter-spacing: 1.3px;
+        }
+
+        #detalje p {
+            font-family: 'Oswald', sans-serif;
+            color: #e3b783;
+            font-size: 1rem;
+        }
+
+        @media screen and (min-width:768px) {}
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Bistro Babushka </h1>
+    <img id="dukke" src="dukke.png" alt="">
+
+
+
+
+
+
+    <section id="detalje">
+        <article class="retterstor">
+            <button class="luk">Tilbage</button>
+            <h2></h2>
+            <img src="" alt="">
+            <p class="id"></p>
+            <p class="pris"></p>
+            <p class="lang"></p>
+            <p class="oprindelse"></p>
+            <p class="kategori"></p>
+
+        </article>
+    </section>
+
+
+
+
+
+
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
+        console.log(id);
+        document.addEventListener("DOMContentLoaded", start);
+
+        const endpoint = "https://spreadsheets.google.com/feeds/list/17Dd7DvkPaFamNUdUKlrFgnH6POvBJXac7qyiS6zNRw0/od6/public/values?alt=json";
+
+        let retter = [];
+
+        const detalje = document.querySelector("#detalje");
+
+
+        function start() {
+            hentData();
+
+        }
+
+
+
+        async function hentData() {
+            const response = await fetch(endpoint);
+            console.log(response);
+            retter = await response.json();
+            visRetter();
+
+
+        }
+
+        function visRetter() {
+
+
+
+
+
+            retter.feed.entry.forEach(hverRet => {
+                if (id == hverRet.gsx$id.$t) {
+
+
+                    detalje.querySelector("h2").textContent = hverRet.gsx$navn.$t;
+                    detalje.querySelector("img").src = "imgs/large/" + hverRet.gsx$billede.$t + ".jpg";
+                    detalje.querySelector(".id").textContent = hverRet.gsx$id.$t;
+                    detalje.querySelector(".kategori").textContent = "Kategori: " + hverRet.gsx$kategori.$t;
+                    detalje.querySelector(".pris").textContent = hverRet.gsx$pris.$t + ",00 DKK";
+                    detalje.querySelector(".lang").textContent = "Beskrivelse: " + hverRet.gsx$lang.$t;
+                    detalje.querySelector(".oprindelse").textContent = "Oprindelse: " + hverRet.gsx$oprindelse.$t;
+                    detalje.querySelector(".luk").addEventListener("click", gåTilbage);
+
+                }
+            })
+
+        }
+
+        function gåTilbage() {
+            history.back();
+        }
+
+    </script>
+</body>
+
+</html>
